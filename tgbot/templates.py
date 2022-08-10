@@ -1,4 +1,4 @@
-from database import Pub
+from tgbot.database import Pub
 from aiogram import types
 
 
@@ -10,6 +10,6 @@ def get_pub_template(pub: Pub):
 Адрес: 📍 {pub.address}\n
 Время работы: {pub.working_hours}'''
 
-    photo = types.InputFile(pub.photos[0])
+    photo = types.InputFile('media/' + pub.photo)
 
     return text, photo

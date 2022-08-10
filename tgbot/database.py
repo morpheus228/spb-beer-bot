@@ -42,16 +42,12 @@ class Database:
 
     async def get_pub_by_id_with_distance(self, pub: list):
         pub_id = pub[0]
-        sql = f'''SELECT (name, description, address, social_media_link, working_hours, latitude, longitude) FROM pubs
+        sql = f'''SELECT (name, description, address, social_media_link, working_hours, latitude, longitude, photo) FROM pubs
         WHERE id={pub_id};'''
         pub_row = (await self.pool.fetchrow(sql))[0]
 
-        sql = f'''SELECT path FROM photos WHERE pub_id={pub_id};'''
-        photos_rows = (await self.pool.fetch(sql))
-
-        photos = [row[0] for row in photos_rows]
         pub_object = Pub(name=pub_row[0], description=pub_row[1], address=pub_row[2], social_media_link=pub_row[3],
-                working_hours=pub_row[4], latitude=pub_row[5], longitude=pub_row[6], photos=photos, distance=pub[1])
+                working_hours=pub_row[4], latitude=pub_row[5], longitude=pub_row[6], photo=pub_row[7], distance=pub[1])
         return pub_object
 
     async def select_all_advertisement_ids(self):
@@ -76,7 +72,7 @@ class Pub:
     address: str
     social_media_link: str
     working_hours: str
-    photos: list
+    photo: str
     latitude: float
     longitude: float
     distance: float

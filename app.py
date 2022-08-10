@@ -1,9 +1,6 @@
 from aiogram import executor
-
 from loader import dp
-# import test
-import handlers
-# import middlewares, filters,
+import tgbot.handlers
 
 
 async def on_startup(dispatcher):

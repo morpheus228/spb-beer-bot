@@ -1,13 +1,13 @@
-version: "3.9"
+version: "3"
 
 services:
   bot:
     build: .
     container_name: tgbot
-    working_dir: "/usr/src/app/${BOT_NAME}"
+    working_dir: "/usr/src/app/${BOT_NAME:-tg_bot}"
     volumes:
-    - .:/usr/src/app/${BOT_NAME}
-    command: python3 -m app
+    - .:/usr/src/app/${BOT_NAME:-tg_bot}
+    command: python3 -m bot
     restart: always
     env_file:
       - ".env"
@@ -15,7 +15,7 @@ services:
     - tg_bot
 
   db:
-    image: postgres:12.0-alpine
+    image: postgres:14.0-alpine
     container_name: postgres
     restart: always
     env_file: .env

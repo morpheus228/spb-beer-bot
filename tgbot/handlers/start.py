@@ -1,18 +1,18 @@
-from aiogram import types, Dispatcher, Bot
+from aiogram import types
 import random
 import time
 
 from aiogram.dispatcher import FSMContext
 
 from loader import dp, db
-from geo import calc_distance
-from keyboards.reply import *
-from keyboards.inline import *
-from states import AgeTaking
-from templates import get_pub_template
+from tgbot.geo import calc_distance
+from tgbot.keyboards.inline import *
+from tgbot.keyboards.reply import age_keyboard, send_geoposition_keyboard, remove_keyboard
+from tgbot.states import AgeTaking
+from tgbot.templates import get_pub_template
 
 
-@dp.message_handler(commands=['start'])
+@dp.message_handler(commands=['start'], state='*')
 async def start_bot(message: types.Message):
     await message.answer('Привет, тебе есть 18 лет?', reply_markup=age_keyboard)
     await AgeTaking.age.set()
@@ -83,7 +83,7 @@ async def send_next_three_pubs(user_id, state):
                 data['message_pub'][sent_message.message_id] = pub
 
                 if data['current_pub'] >= len(data['the_best_pubs']):
-                    await db.send_message(user_id, 'Наш список мест с крафтовом пивом закончился((')
+                    await dp.bot.send_message(user_id, 'Наш список мест с крафтовом пивом закончился((')
                     return 'end'
 
             else:
@@ -95,7 +95,7 @@ async def send_advertisement(user_id):
     advertisement_id = random.choice(advertisement_ids)
     advertisement = await db.get_advertisement_by_id(advertisement_id[0])
 
-    photo = types.InputFile(advertisement.photo)
+    photo = types.InputFile('media/' + advertisement.photo)
     reply_markup = get_advertisement_keyboard(advertisement.keyboard_text, advertisement.keyboard_link)
 
     await dp.bot.send_photo(user_id, photo=photo, caption=advertisement.text, reply_markup=reply_markup)
@@ -110,12 +110,15 @@ async def send_pub_location(call: types.CallbackQuery, state: FSMContext):
 
 @dp.callback_query_handler(text="more_pubs", state=AgeTaking.pubs)
 async def send_more_pubs(call: types.CallbackQuery, state: FSMContext):
+    await call.message.delete()
+
     status = await send_next_three_pubs(call.from_user.id, state)
+
     if status == 'end':
         pass
 
     elif status == 'advertisement':
-        AgeTaking.location.set()
+        pass
 
     elif status == 'not_end':
         await call.message.answer('Не нашли подходящее место?', reply_markup=more_pubs_keyboard)
