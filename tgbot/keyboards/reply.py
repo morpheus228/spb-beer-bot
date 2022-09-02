@@ -7,5 +7,5 @@ remove_keyboard = ReplyKeyboardRemove()
 
 send_geoposition_keyboard = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton(text='📍 Отправить местоположение', request_location=True)]],
-    resize_keyboard=True, one_time_keyboard=True)
+    resize_keyboard=True, one_time_keyboard=False)
 

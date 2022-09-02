@@ -40,14 +40,21 @@ class Database:
         pubs = await self.pool.fetch(sql)
         return pubs
 
+    async def get_pubs_count(self):
+        sql = f'''SELECT COUNT(*) FROM pubs;'''
+        count = await self.pool.fetch(sql)
+        return count[0][0]
+
     async def get_pub_by_id_with_distance(self, pub: list):
         pub_id = pub[0]
-        sql = f'''SELECT (name, description, address, social_media_link, working_hours, latitude, longitude, photo) FROM pubs
+        sql = f'''SELECT (name, description, address, social_media_link,
+        working_hours, latitude, longitude, photo, ymaps, city, place) FROM pubs
         WHERE id={pub_id};'''
         pub_row = (await self.pool.fetchrow(sql))[0]
 
         pub_object = Pub(name=pub_row[0], description=pub_row[1], address=pub_row[2], social_media_link=pub_row[3],
-                working_hours=pub_row[4], latitude=pub_row[5], longitude=pub_row[6], photo=pub_row[7], distance=pub[1])
+                         working_hours=pub_row[4], latitude=pub_row[5], longitude=pub_row[6], photo=pub_row[7],
+                         ymaps=pub_row[8], city=pub_row[9], place=pub_row[10], distance=pub[1])
         return pub_object
 
     async def select_all_advertisement_ids(self):
@@ -70,11 +77,14 @@ class Pub:
     name: str
     description: str
     address: str
+    place: str
     social_media_link: str
     working_hours: str
     photo: str
     latitude: float
     longitude: float
+    city: str
+    ymaps: str
     distance: float
 
 
