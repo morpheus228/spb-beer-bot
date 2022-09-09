@@ -9,7 +9,7 @@ from tgbot.geo import calc_distance
 from tgbot.keyboards.inline import *
 from tgbot.keyboards.reply import age_keyboard, send_geoposition_keyboard, remove_keyboard
 from tgbot.states import AgeTaking
-from tgbot.templates import get_pub_template
+from tgbot.templates import get_pub_template, get_introduction_template
 
 
 @dp.message_handler(commands=['start'], state='*')
@@ -21,10 +21,11 @@ async def start_bot(message: types.Message):
 @dp.message_handler(state=AgeTaking.age)
 async def take_user_age(message: types.Message,  state: FSMContext):
     if message.text == age_keyboard.keyboard[0][0]['text']:
-        await message.answer('Отправь свое местоположение и получи 3 места с крафтовым пивом поблизости 🍺',
-                             reply_markup=send_geoposition_keyboard)
+
+        introduction_text = await get_introduction_template(db)
+
+        await message.answer(introduction_text, reply_markup=send_geoposition_keyboard)
         await AgeTaking.location.set()
-        await state.update_data(message_pub={})
 
     elif message.text == age_keyboard.keyboard[0][1]['text']:
         await dp.bot.send_photo(chat_id=message.chat.id, photo=types.InputFile('media/sorry.jpg'), caption='Тогда извини.',
@@ -36,13 +37,12 @@ async def take_user_age(message: types.Message,  state: FSMContext):
 
 @dp.message_handler(state=AgeTaking.location)
 async def take_not_user_location(message: types.Message):
-    await message.answer('Отправь свое местоположение и получи 3 места с крафтовым пивом поблизости 🍺',
+    await message.answer('Отправь своё местоположение и получи 3 места с крафтовым пивом поблизости 🍺',
                          reply_markup=send_geoposition_keyboard)
 
 
 @dp.message_handler(state='*', content_types=['location'])
 async def take_user_location(message: types.Message,  state: FSMContext):
-    time1 = time.time()
     location = (message.location['latitude'], message.location['longitude'])
     pubs = await db.select_all_pubs()
     distances = []
@@ -54,72 +54,13 @@ async def take_user_location(message: types.Message,  state: FSMContext):
     the_best_distances = sorted(distances, key=lambda x: x[1])
     the_best_pubs = [await db.get_pub_by_id_with_distance(pub) for pub in the_best_distances]
 
-    await state.update_data(the_best_pubs=the_best_pubs)
-    await state.update_data(current_pub=0)
-    await state.update_data(call_func_count=0)
+    text = '<b>Ближайшие места:</b>\n\n'
 
-    await send_next_three_pubs(message.from_user.id, state)
+    for pub in the_best_pubs[:10]:
+        pub_text = get_pub_template(pub)
+        text += pub_text
+        text += '\n\n'
 
-    await AgeTaking.pubs.set()
-    await message.answer('Не нашли подходящее место?', reply_markup=more_pubs_keyboard)
+    text += '<b💬:><a href="https://t.me/+CGtE4W5gKoE0N2Yy">Craft Beer Chat</a></b>'
 
-
-async def send_next_three_pubs(user_id, state):
-    async with state.proxy() as data:
-        data['call_func_count'] += 1
-
-        # Проверка на вызов рекламы (каждый третий вызов пользователя буде с рекламой)
-        if data['call_func_count'] % 3 == 0:
-            await send_advertisement(user_id)
-            return 'advertisement'
-
-        else:
-            for i in range(3):
-                pub = data['the_best_pubs'][data['current_pub']]
-                text, photo = get_pub_template(pub)
-                sent_message = await dp.bot.send_photo(user_id, caption=text, photo=photo,
-                                                       reply_markup=on_map_keyboard)
-                data['current_pub'] += 1
-                data['message_pub'][sent_message.message_id] = pub
-
-                if data['current_pub'] >= len(data['the_best_pubs']):
-                    await dp.bot.send_message(user_id, 'Наш список мест с крафтовом пивом закончился((')
-                    return 'end'
-
-            else:
-                return 'not_end'
-
-
-async def send_advertisement(user_id):
-    advertisement_ids = await db.select_all_advertisement_ids()
-    advertisement_id = random.choice(advertisement_ids)
-    advertisement = await db.get_advertisement_by_id(advertisement_id[0])
-
-    photo = types.InputFile('media/' + advertisement.photo)
-    reply_markup = get_advertisement_keyboard(advertisement.keyboard_text, advertisement.keyboard_link)
-
-    await dp.bot.send_photo(user_id, photo=photo, caption=advertisement.text, reply_markup=reply_markup)
-
-
-@dp.callback_query_handler(text="on_map", state=AgeTaking.pubs)
-async def send_pub_location(call: types.CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    pub = data['message_pub'][call.message.message_id]
-    await dp.bot.send_location(call.message.chat.id, pub.latitude, pub.longitude)
-
-
-@dp.callback_query_handler(text="more_pubs", state=AgeTaking.pubs)
-async def send_more_pubs(call: types.CallbackQuery, state: FSMContext):
-    await call.message.delete()
-
-    status = await send_next_three_pubs(call.from_user.id, state)
-
-    if status == 'end':
-        pass
-
-    elif status == 'advertisement':
-        pass
-
-    elif status == 'not_end':
-        await call.message.answer('Не нашли подходящее место?', reply_markup=more_pubs_keyboard)
-
+    await message.answer(text, disable_web_page_preview=True, )

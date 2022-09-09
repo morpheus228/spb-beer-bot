@@ -6,6 +6,6 @@ age_keyboard = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Да ✅'), K
 remove_keyboard = ReplyKeyboardRemove()
 
 send_geoposition_keyboard = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton(text='📍 Отправить местоположение', request_location=True)]],
-    resize_keyboard=True, one_time_keyboard=True)
+    keyboard=[[KeyboardButton(text='📍 Отправить своё местоположение', request_location=True)]],
+    resize_keyboard=True, one_time_keyboard=False)
 
