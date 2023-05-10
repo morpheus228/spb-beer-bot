@@ -1,8 +1,19 @@
-FROM python:3.9
-ENV BOT_NAME=$BOT_NAME
+FROM python:3.8-slim-buster
+WORKDIR /code
 
-WORKDIR /usr/src/app/"${BOT_NAME:-tg_bot}"
+# Upgrade installed packages
+RUN apt-get -y update
+RUN apt-get -y upgrade
 
-COPY requirements.txt /usr/src/app/"${BOT_NAME:-tg_bot}"
-RUN pip install -r /usr/src/app/"${BOT_NAME:-tg_bot}"/requirements.txt
-COPY . /usr/src/app/"${BOT_NAME:-tg_bot}"
+# Install requirements
+COPY requirements.txt requirements.txt
+RUN pip install --upgrade pip
+RUN pip3 install -r requirements.txt
+
+# Install supervisor
+RUN apt-get install  -y supervisor
+COPY supervisord.conf /etc/supervisor/supervisord.conf
+
+COPY . .
+
+CMD ["/usr/bin/supervisord"]
