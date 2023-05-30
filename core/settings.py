@@ -25,7 +25,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tgbot.apps.TgbotConfig',
+    'django.contrib.postgres',
+    'tgbot.apps.TgbotConfig'
 ]
 
 MIDDLEWARE = [
@@ -60,19 +61,17 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'spb_beer',
+        'USER': 'django_admin',
+        'PASSWORD': 'r45uDfbh32QAHDbAF',
+        'HOST': 'db',
+        'PORT': '5433',
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {

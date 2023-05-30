@@ -1,7 +1,18 @@
-version: "2"
+version: '3'
 
 services:
-  bot_web:
-    build: .
-    ports:
-      - "8000:8000"
+    bot_web:
+        build: .
+        ports:
+            - "8000:8000"
+    db:
+        image: postgres:13
+        expose:
+            - 5433
+        ports:
+            - 5433:5433
+        environment:
+            - POSTGRES_PASSWORD=r45uDfbh32QAHDbAF
+            - POSTGRES_USER=django_admin
+            - POSTGRES_DB=spb_beer
+        command: -p 5433
