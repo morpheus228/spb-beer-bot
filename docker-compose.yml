@@ -1,18 +1,35 @@
 version: '3'
 
 services:
-    bot_web:
+    web:
         build: .
         ports:
-            - "8000:8000"
+            - 8000:8000
+        depends_on:
+            - db
+        volumes:
+            - .:/code/
+        command: python manage.py runserver 0.0.0.0:8000
+
+    bot:
+        build: .
+        depends_on:
+            - db
+        volumes:
+            - .:/code/
+        command: python manage.py bot
+
     db:
         image: postgres:13
-        expose:
-            - 5433
         ports:
-            - 5433:5433
+            - 5432:5432
         environment:
             - POSTGRES_PASSWORD=r45uDfbh32QAHDbAF
             - POSTGRES_USER=django_admin
             - POSTGRES_DB=spb_beer
-        command: -p 5433
+        volumes:
+            - pg1:/var/lib/postgresql/data
+
+volumes:
+    pg1:
+        external: true
