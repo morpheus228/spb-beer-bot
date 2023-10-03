@@ -17,7 +17,7 @@ sorry = Template(
 introduction = Template(
     '<b>🍺 Craft Beer Map</b>\n\n'
     'Количество мест: <b>${pubs_count}</b>\n\n'
-    'Отправь свое местоположение и получи места с крафтовым пивом поблизости 📍'
+    '📍Отправь свое местоположение и получи места с крафтовым пивом поблизости'
 )
 
 send_location = Template(
@@ -31,9 +31,9 @@ def nearest_pubs_F(pubs) -> str:
     for i in pubs:
         pub = i[0]
         distance = i[1]
-        text += f'🍺 <a href="{pub.social_media_link}">{pub.name}</a>\n' \
+        text += f'🍺 {pub.name}\n' \
                 f'{pub.place_type}, до него {round(distance, 1)} км\n' \
                 f'{pub.address}, <a href="{pub.ymaps}">на карте</a>\n\n'
 
-    text += '<b>💬 <a href="https://t.me/+HfX3xo3xxUI2ZGMy">Craft Beer Map Chat</a></b>'
+    text += '<b>💬: <a href="https://t.me/+HfX3xo3xxUI2ZGMy">Craft Beer Map Chat</a></b>'
     return text

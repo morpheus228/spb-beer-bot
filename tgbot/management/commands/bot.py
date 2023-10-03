@@ -6,6 +6,8 @@ from aiogram import types, Dispatcher, Bot
 from django.conf import settings
 
 from tgbot.handlers.start import start_router
+from tgbot.handlers.admin import admin_router
+
 from tgbot.middlewares.start import StartMiddleware
 
 
@@ -23,6 +25,7 @@ def register_all_middlewares(dp):
 
 def register_all_handlers(dp):
     for router in [
+        admin_router,
         start_router
     ]:
         dp.include_router(router)

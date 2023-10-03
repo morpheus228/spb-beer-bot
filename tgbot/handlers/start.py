@@ -6,7 +6,7 @@ from aiogram.types import Message, FSInputFile
 from tgbot.misc import replicas, keyboards
 from tgbot.misc.funcs import get_nearest_pubs
 from tgbot.misc.states import mainSG
-from tgbot.models import Pub
+from tgbot.models import Pub, UserLocation
 
 start_router = Router()
 
@@ -41,5 +41,9 @@ async def take_not_location(message: Message):
 
 @start_router.message(mainSG.location, F.content_type.in_(['location']))
 async def take_location(message: Message):
+    UserLocation.objects.create(user_id = message.from_user.id, 
+                                latitude = message.location.latitude,
+                                longitude = message.location.longitude)
+    
     location = (message.location.latitude, message.location.longitude)
     await message.answer(text=replicas.nearest_pubs_F(get_nearest_pubs(location)), disable_web_page_preview=True)

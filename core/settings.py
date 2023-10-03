@@ -103,3 +103,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 BOT_TOKEN = env.str('BOT_TOKEN')
+BOT_ADMINS = list(map(int, env.str('BOT_ADMINS').split(',')))

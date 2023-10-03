@@ -18,6 +18,22 @@ class User(models.Model):
         ordering = ['created_at']
 
 
+class UserLocation(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ID')
+    user_id = models.BigIntegerField(verbose_name='ID пользователя')
+    latitude = models.FloatField(verbose_name='Широта', null=True, blank=True)
+    longitude = models.FloatField(verbose_name='Долгота', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
+
+    def __str__(self):
+        return f'id{self.user_id}: ({self.latitude}, {self.longitude})'
+
+    class Meta:
+        verbose_name = "Локация пользователя"
+        verbose_name_plural = "Локации пользователей"
+        ordering = ['created_at']
+
+
 class Pub(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name='ID')
     name = models.CharField(max_length=300, null=True, blank=True, default='Название', verbose_name='Название')

@@ -28,8 +28,8 @@ services:
             - POSTGRES_USER=django_admin
             - POSTGRES_DB=spb_beer
         volumes:
-            - pg1:/var/lib/postgresql/data
+            - spb_beer_bot_pg:/var/lib/postgresql/data
 
 volumes:
-    pg1:
+    spb_beer_bot_pg:
         external: true

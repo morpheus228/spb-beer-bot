@@ -32,3 +32,9 @@ send_geoposition = ReplyKeyboardMarkup(
 #     advertisement_keyboard.add(InlineKeyboardButton(text='Показать ещё три ➡️', callback_data='more_pubs'))
 #
 #     return advertisement_keyboard
+
+admin_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text='Загрузить файл с пабами', callback_data="upload_pubs")]
+    ]
+)
