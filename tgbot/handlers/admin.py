@@ -34,6 +34,12 @@ async def request_pubs_file(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text("Отправьте файл...")
     await state.set_state(States.file)
 
+    
+@admin_router.callback_query(F.data == "facebook")
+async def request_pubs_filfghdhdhe(call: CallbackQuery, state: FSMContext):
+    print("YEEEES")
+    await call.message.edit_text("Вы нажали кнопку")
+
 
 @admin_router.message(States.file, F.document != None)
 async def request_pubs_file(message: Message, bot: Bot, state: FSMContext):
@@ -51,16 +57,19 @@ async def upload_pubs_file(bot: Bot, document: Document):
     path = f"files/{file.file_id}"
     await bot.download_file(file.file_path, path)
 
-    pubs = pd.read_excel(path)
-    pubs = [Pub(
-            id = row['ID'],
-            address = row['Адрес'],
-            name = row['Название'],
-            place_type = row['Тип заведения'],
+    df = pd.read_excel(path)
+    pubs = []
+
+    for index, row in df.iterrows():
+        pubs.append(Pub(
+            id = row['id'],
+            address = row['address'],
+            name = row['name'],
+            place_type = row['type'],
             latitude = row['latitude'],
             longitude = row['longitude'],
             ymaps = row['ymaps']
-        ) for index, row in pubs.iterrows()]
+        ))
     
     UserLocation.objects.all().delete()
     for pub in pubs:

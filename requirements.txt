@@ -4,3 +4,6 @@ environs==9.5.0
 geopy
 Pillow
 psycopg2-binary==2.9.6
+pandas
+openpyxl
+pymongo
