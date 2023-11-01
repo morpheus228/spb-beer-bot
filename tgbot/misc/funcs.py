@@ -9,7 +9,7 @@ def calc_distance(first_coords, second_coords):
     return GD(first_coords, second_coords).km
 
 
-def get_nearest_pubs(location, n=3) -> List[Tuple[Pub, float]]:
+def get_nearest_pubs(location, n=7) -> List[Tuple[Pub, float]]:
     pubs = Pub.objects.values('id', 'latitude', 'longitude')
     pub_distance_dict = {pub['id']: calc_distance(location, (pub['latitude'], pub['longitude'])) for pub in pubs}
     nearest_pub_pairs = sorted(pub_distance_dict.items(), key=lambda j: j[1], reverse=False)[:n]
